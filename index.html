@@ -8,6 +8,19 @@
   <link rel="stylesheet" href="signin.css" />
   <link rel="icon" type="image/png" href="icone.png"> <!-- Substitua pelo caminho real do seu ícone -->
   <style>
+    #disable-right-click-message {
+                    display: none;
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background-color: #041c04;
+                    padding: 40px;
+                    border: 2px solid #17fd36;
+                    border-radius: 10px;
+                    z-index: 1000;
+                }
+
   </style>
   <title>MEGA FLUXO PRÓ GAIN</title>
 </head>
@@ -43,6 +56,9 @@
           Suporte
         </button>
       </div>
+      <div id="disable-right-click-message">
+        <p>Boa tentativa! Mas você não tem permissão para acessar ao código! </p>
+    </div>
     </div>
   </div>
 
@@ -59,7 +75,31 @@
     };
     firebase.initializeApp(firebaseConfig);
   </script>
+   <script>
+    var isRightClickMessageVisible = false;
 
+document.addEventListener('contextmenu', function (e) {
+e.preventDefault();
+toggleDisableRightClickMessage();
+});
+
+document.addEventListener('click', function (e) {
+if (isRightClickMessageVisible) {
+    toggleDisableRightClickMessage();
+}
+});
+
+function toggleDisableRightClickMessage() {
+var messageContainer = document.getElementById('disable-right-click-message');
+isRightClickMessageVisible = !isRightClickMessageVisible;
+
+if (isRightClickMessageVisible) {
+    messageContainer.style.display = 'block';
+} else {
+    messageContainer.style.display = 'none';
+}
+}
+</script>
   <script>
     document.getElementById('btnEntrar').addEventListener('click', function () {
       const usuario = document.getElementById('usuario').value.trim();
