@@ -9,22 +9,59 @@
   <link rel="icon" type="image/png" href="icone.png"> <!-- Substitua pelo caminho real do seu ícone -->
   <style>
     #disable-right-click-message {
-                    display: none;
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background-color: #041c04;
-                    padding: 40px;
-                    border: 2px solid #17fd36;
-                    border-radius: 10px;
-                    z-index: 1000;
-                }
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #041c04;
+      padding: 40px;
+      border: 2px solid #17fd36;
+      border-radius: 10px;
+      z-index: 1000;
+    }
 
+    #translate-button {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: #3498db;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      cursor: pointer;
+    }
+
+    #language-selector {
+      display: none;
+      position: fixed;
+      top: 40px;
+      right: 20px;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+
+    #language-selector select {
+      width: 100%;
+      padding: 5px;
+    }
   </style>
   <title>MEGA FLUXO PRÓ GAIN</title>
 </head>
 <body>
+  <button id="translate-button" onclick="toggleLanguageSelector()">Traduzir</button>
+
+  <div id="language-selector">
+    <label for="language">Escolha o idioma:</label>
+    <select id="language" onchange="translatePage()">
+      <option value="en">Inglês</option>
+      <option value="es">Espanhol</option>
+      <option value="fr">Francês</option>
+      <!-- Adicione mais idiomas conforme necessário -->
+    </select>
+  </div>
+
   <div class="container">
     <div class="card">
       <h1>Login</h1>
@@ -41,7 +78,6 @@
       <div class="justify-center">
         <button id="btnEntrar">Entrar</button>
       </div>
-      <!-- Links de cadastro -->
       <div class="justify-center">
         <p>
           Crie seu login |
@@ -50,7 +86,6 @@
           </a>
         </p>
       </div>
-      <!-- Botão de suporte -->
       <div class="justify-center support-button-container">
         <button class="support-button" onclick="window.location.href='https://t.me/Tiagobots'">
           Suporte
@@ -58,7 +93,7 @@
       </div>
       <div id="disable-right-click-message">
         <p>Boa tentativa! Mas você não tem permissão para acessar ao código! </p>
-    </div>
+      </div>
     </div>
   </div>
 
@@ -66,7 +101,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
   <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyCT2mKO_QlYTUVMi0E2Wi3rHVcHmqaUMTE",
+      apiKey: "YOUR_FIREBASE_API_KEY",
       authDomain: "mega-fluxo-pro-adm.firebaseapp.com",
       projectId: "mega-fluxo-pro-adm",
       storageBucket: "mega-fluxo-pro-adm.appspot.com",
@@ -75,41 +110,41 @@
     };
     firebase.initializeApp(firebaseConfig);
   </script>
-   <script>
+
+  <script>
     var isRightClickMessageVisible = false;
 
-document.addEventListener('contextmenu', function (e) {
-e.preventDefault();
-toggleDisableRightClickMessage();
-});
+    document.addEventListener('contextmenu', function (e) {
+      e.preventDefault();
+      toggleDisableRightClickMessage();
+    });
 
-document.addEventListener('click', function (e) {
-if (isRightClickMessageVisible) {
-    toggleDisableRightClickMessage();
-}
-});
+    document.addEventListener('click', function (e) {
+      if (isRightClickMessageVisible) {
+        toggleDisableRightClickMessage();
+      }
+    });
 
-function toggleDisableRightClickMessage() {
-var messageContainer = document.getElementById('disable-right-click-message');
-isRightClickMessageVisible = !isRightClickMessageVisible;
+    function toggleDisableRightClickMessage() {
+      var messageContainer = document.getElementById('disable-right-click-message');
+      isRightClickMessageVisible = !isRightClickMessageVisible;
 
-if (isRightClickMessageVisible) {
-    messageContainer.style.display = 'block';
-} else {
-    messageContainer.style.display = 'none';
-}
-}
-</script>
+      if (isRightClickMessageVisible) {
+        messageContainer.style.display = 'block';
+      } else {
+        messageContainer.style.display = 'none';
+      }
+    }
+  </script>
+
   <script>
     document.getElementById('btnEntrar').addEventListener('click', function () {
       const usuario = document.getElementById('usuario').value.trim();
       const senha = document.getElementById('senha').value.trim();
 
       if (usuario.toLowerCase() === 'admin') {
-        // Redirecionar para o seu site desejado
         window.location.href = 'https://console.firebase.google.com/u/0/project/mega-fluxo-pro-adm/authentication/users?hl=pt-br';
       } else {
-        // Exibir mensagem de erro caso as credenciais sejam inválidas
         document.getElementById('msgError').innerHTML = 'Credenciais inválidas. Tente novamente.';
       }
     });
@@ -118,5 +153,43 @@ if (isRightClickMessageVisible) {
   <script src="signin.js"></script>
   <script src="validations.js"></script>
   <script src="loading.js"></script>
+
+  <!-- Funções para o botão de tradução -->
+  <script>
+    function toggleLanguageSelector() {
+      var languageSelector = document.getElementById('language-selector');
+      languageSelector.style.display = (languageSelector.style.display === 'block') ? 'none' : 'block';
+    }
+
+    async function translatePage() {
+      var selectedLanguage = document.getElementById('language').value;
+
+      // Use a API de tradução para traduzir a página
+      var elementsToTranslate = document.querySelectorAll('[data-translate]');
+      elementsToTranslate.forEach(async function (element) {
+        var originalText = element.innerText;
+        var translatedText = await translateText(originalText, selectedLanguage);
+        element.innerText = translatedText;
+      });
+    }
+
+    async function translateText(text, targetLanguage) {
+      // Substitua 'YOUR_TRANSLATOR_API_KEY' pela sua chave de API do Microsoft Translator
+      var apiKey = 'YOUR_TRANSLATOR_API_KEY';
+      var apiUrl = `https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=${targetLanguage}`;
+
+      var response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Ocp-Apim-Subscription-Key': apiKey,
+        },
+        body: JSON.stringify([{ text: text }]),
+      });
+
+      var result = await response.json();
+      return result[0].translations[0].text;
+    }
+  </script>
 </body>
 </html>

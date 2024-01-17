@@ -653,93 +653,106 @@
                             <div id="container">
                                 
                                 <label for="mensagem" id="titulo">SINAIS VIP DE HOJE: </label>
-                                <br>
-                                <textarea id="mensagem" name="mensagem" readonly></textarea>
-                                <button id="baixarBtn" onclick="baixarInformacoes()">BAIXAR LISTA DE SINAIS VIP </button>
-                                <a href="#" onclick="copiarSinais()">
-                                    <img id="imagemIcone" src="copy.png" alt="Ícone de cópia">
-                                </a>
-                            </div>
-                            
-                            <script>
-                                function generateSignal(ativo, direcao, horario, timeframe) {
-                            const horaSinal = parseInt(horario.split(':')[0]);
-                            const isHorarioValido = horaSinal >= 18 && horaSinal <= 23;
-                
-                            const isFinalDeSemana = new Date().getDay() === 0 || new Date().getDay() === 6;
-                
-                            const ativoFormatado = (isHorarioValido || isFinalDeSemana) ? `${ativo}-OTC` : ativo;
-                
-                            return `${ativoFormatado} ${direcao} ${horario} ${timeframe}`;
-                        }
-                
-                        function generateDailySignals() {
-                            const mensagemTextArea = document.getElementById('mensagem');
-                            mensagemTextArea.value = ''; // Limpa a área de texto
-                
-                            const ativos = ["EUR/GBP", "EUR/USD", "GBP/JPY", "USD/JPY", "AUD/CAD", "GBP/USD", "EUR/JPY"];
-                            const direcoes = ["CALL", "PUT"];
-                            const timeframes = ["M1", "M5"];
-                            const sinaisPorDia = 50;
-                
-                            const titulo = document.getElementById('titulo');
-                            const dataAtual = new Date();
-                            const diaFormatado = String(dataAtual.getDate()).padStart(2, '0');
-                            const mesFormatado = String(dataAtual.getMonth() + 1).padStart(2, '0');
-                            const anoFormatado = dataAtual.getFullYear();
-                            const dataFormatada = `${diaFormatado}/${mesFormatado}/${anoFormatado}`;
-                            titulo.textContent += dataFormatada;
-                
-                            const horas = Array.from({ length: sinaisPorDia }, () => {
-                                const hour = String(Math.floor(Math.random() * 24)).padStart(2, '0');
-                                const minute = String(Math.floor(Math.random() * 60)).padStart(2, '0');
-                                return `${hour}:${minute}`;
-                            });
-                
-                            for (let i = 0; i < sinaisPorDia; i++) {
-                                const ativo = ativos[Math.floor(Math.random() * ativos.length)];
-                                const direcao = direcoes[Math.floor(Math.random() * direcoes.length)];
-                                const horario = horas[i];
-                                const timeframe = timeframes[Math.floor(Math.random() * timeframes.length)];
-                
-                                const novoSinal = generateSignal(ativo, direcao, horario, timeframe);
-                                mensagemTextArea.value += novoSinal + '\n';
-                                    }
-                                }
-                        
-                                function baixarInformacoes() {
-                                    var conteudo = document.getElementById('mensagem').value;
-                                    var blob = new Blob([conteudo], { type: 'text/plain' });
-                                    var url = window.URL.createObjectURL(blob);
-                        
-                                    var a = document.createElement('a');
-                                    a.href = url;
-                                    a.download = `sinaisvip${getDateFormatted()}.txt`; // Nome do arquivo com a data formatada
-                                    document.body.appendChild(a);
-                                    a.click();
-                        
-                                    window.URL.revokeObjectURL(url);
-                                }
-                        
-                                function copiarSinais() {
-                            var mensagemTextArea = document.getElementById('mensagem');
-                            mensagemTextArea.select();
-                            document.execCommand('copy');
-                
-                            // Exibe uma mensagem após a cópia
-                            alert('Sinais copiados!');
-                        }
-                
-                                function getDateFormatted() {
-                                    const dataAtual = new Date();
-                                    const diaFormatado = String(dataAtual.getDate()).padStart(2, '0');
-                                    const mesFormatado = String(dataAtual.getMonth() + 1).padStart(2, '0');
-                                    const anoFormatado = dataAtual.getFullYear();
-                                    return `${diaFormatado}${mesFormatado}${anoFormatado}`;
-                                }
-                        
-                                // Chamada inicial para gerar sinais no carregamento da página
-                                generateDailySignals();
+<br>
+<textarea id="mensagem" name="mensagem" readonly></textarea>
+<button id="baixarBtn" onclick="baixarInformacoes()">BAIXAR LISTA DE SINAIS VIP </button>
+<a href="#" onclick="copiarSinais()">
+    <img id="imagemIcone" src="copy.png" alt="Ícone de cópia">
+</a>
+</div>
+
+<script>
+    function generateSignal(ativo, direcao, horario, timeframe) {
+        const horaSinal = parseInt(horario.split(':')[0]);
+        const isHorarioValido = horaSinal >= 18 && horaSinal <= 23;
+
+        const isFinalDeSemana = new Date().getDay() === 0 || new Date().getDay() === 6;
+
+        const ativoFormatado = (isHorarioValido || isFinalDeSemana) ? `${ativo}-OTC` : ativo;
+
+        return `${ativoFormatado} ${direcao} ${horario} ${timeframe}`;
+    }
+
+    function generateDailySignals() {
+        const mensagemTextArea = document.getElementById('mensagem');
+        const titulo = document.getElementById('titulo');
+        const storedDate = localStorage.getItem('generatedDate');
+        const currentDate = new Date();
+        const diaFormatado = String(currentDate.getDate()).padStart(2, '0');
+        const mesFormatado = String(currentDate.getMonth() + 1).padStart(2, '0');
+        const anoFormatado = currentDate.getFullYear();
+        const dataFormatada = `${diaFormatado}/${mesFormatado}/${anoFormatado}`;
+
+        titulo.textContent = `SINAIS VIP DE HOJE: ${dataFormatada}`;
+
+        if (storedDate === dataFormatada) {
+            // Se a lista já foi gerada hoje, carrega do armazenamento local
+            const storedSignals = localStorage.getItem('dailySignals');
+            mensagemTextArea.value = storedSignals;
+        } else {
+            // Se ainda não gerou a lista para hoje, gera uma nova
+            mensagemTextArea.value = ''; // Limpa a área de texto
+
+            const ativos = ["EUR/GBP", "EUR/USD", "GBP/JPY", "USD/JPY", "AUD/CAD", "GBP/USD", "EUR/JPY"];
+            const direcoes = ["CALL", "PUT"];
+            const timeframes = ["M1", "M5"];
+            const sinaisPorDia = 50;
+
+            const horas = Array.from({ length: sinaisPorDia }, () => {
+                const hour = String(Math.floor(Math.random() * 24)).padStart(2, '0');
+                const minute = String(Math.floor(Math.random() * 60)).padStart(2, '0');
+                return `${hour}:${minute}`;
+            });
+
+            for (let i = 0; i < sinaisPorDia; i++) {
+                const ativo = ativos[Math.floor(Math.random() * ativos.length)];
+                const direcao = direcoes[Math.floor(Math.random() * direcoes.length)];
+                const horario = horas[i];
+                const timeframe = timeframes[Math.floor(Math.random() * timeframes.length)];
+
+                const novoSinal = generateSignal(ativo, direcao, horario, timeframe);
+                mensagemTextArea.value += novoSinal + '\n';
+            }
+
+            // Salva os sinais gerados e a data no armazenamento local
+            localStorage.setItem('dailySignals', mensagemTextArea.value);
+            localStorage.setItem('generatedDate', dataFormatada);
+        }
+    }
+
+    function baixarInformacoes() {
+        var conteudo = document.getElementById('mensagem').value;
+        var blob = new Blob([conteudo], { type: 'text/plain' });
+        var url = window.URL.createObjectURL(blob);
+
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = `sinaisvip${getDateFormatted()}.txt`; // Nome do arquivo com a data formatada
+        document.body.appendChild(a);
+        a.click();
+
+        window.URL.revokeObjectURL(url);
+    }
+
+    function copiarSinais() {
+        var mensagemTextArea = document.getElementById('mensagem');
+        mensagemTextArea.select();
+        document.execCommand('copy');
+
+        // Exibe uma mensagem após a cópia
+        alert('Sinais copiados!');
+    }
+
+    function getDateFormatted() {
+        const dataAtual = new Date();
+        const diaFormatado = String(dataAtual.getDate()).padStart(2, '0');
+        const mesFormatado = String(dataAtual.getMonth() + 1).padStart(2, '0');
+        const anoFormatado = dataAtual.getFullYear();
+        return `${diaFormatado}${mesFormatado}${anoFormatado}`;
+    }
+
+    // Chamada inicial para gerar sinais no carregamento da página
+    generateDailySignals();
                             </script>
                         </body>
 </body>
